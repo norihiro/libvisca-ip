@@ -23,15 +23,12 @@
 #define __LIBVISCA_H__
 
 #if defined(_WIN32) || defined(WIN32) || defined(__WIN32__) || defined(_MSC_VER)
-#ifdef DLL_EXPORTS
-#define VISCA_API __declspec(dllexport)
-#else
+#ifndef VISCA_API
 #define VISCA_API __declspec(dllimport)
 #endif
 #define VISCA_WIN
 #else
 #define VISCA_API
-#define VISCA_POSIX
 #endif
 
 /**********************/

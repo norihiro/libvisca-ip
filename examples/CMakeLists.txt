@@ -1,3 +1,8 @@
+if (WIN32)
+	if(NOT BUILD_SHARED_LIBS)
+		set_target_properties(visca PROPERTIES COMPILE_DEFINITIONS "VISCA_API=")
+	endif()
+endif()
 ADD_EXECUTABLE(visca_cli visca_cli.c)
 ADD_EXECUTABLE(testvisca testvisca.c)
 TARGET_LINK_LIBRARIES(visca_cli visca)
