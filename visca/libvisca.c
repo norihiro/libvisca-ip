@@ -44,7 +44,7 @@ uint32_t _VISCA_write_packet_data(VISCAInterface_t *iface, VISCACamera_t *camera
 	int bytes_written;
 
 	bytes_written = iface->callback->write(iface, packet->bytes, packet->length);
-	if (bytes_written < packet->length)
+	if (bytes_written < (int)packet->length)
 		return VISCA_FAILURE;
 	else
 		return VISCA_SUCCESS;
