@@ -430,7 +430,16 @@ void open_interface()
 {
 	int camera_num;
 	char *sep;
-	if (sep = strrchr(ttydev, ':')) {
+	if (strncmp(ttydev, "udp://", 6) == 0 && (sep = strrchr(ttydev + 6, ':'))) {
+		int port = atoi(sep + 1);
+		char *host = strdup(ttydev + 6);
+		host[sep - (ttydev + 6)] = '\0';
+		if (VISCA_open_udp(&iface, host, port) != VISCA_SUCCESS) {
+			fprintf(stderr, "visca-cli: unable to open udp device %s:%d\n", host, port);
+			exit(1);
+		}
+		free(host);
+	} else if (sep = strrchr(ttydev, ':')) {
 		int port = atoi(sep + 1);
 		char *host = strdup(ttydev);
 		host[sep - ttydev] = '\0';

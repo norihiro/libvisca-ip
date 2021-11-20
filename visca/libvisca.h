@@ -500,6 +500,7 @@ VISCA_API uint32_t VISCA_get_camera_info(VISCAInterface_t *iface, VISCACamera_t 
 
 VISCA_API uint32_t VISCA_open_serial(VISCAInterface_t *iface, const char *device_name);
 VISCA_API uint32_t VISCA_open_tcp(VISCAInterface_t *iface, const char *hostname, int port);
+VISCA_API uint32_t VISCA_open_udp(VISCAInterface_t *iface, const char *hostname, int port);
 
 VISCA_API uint32_t VISCA_close(VISCAInterface_t *iface);
 

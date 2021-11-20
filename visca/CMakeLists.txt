@@ -6,6 +6,7 @@ IF (WIN32)
 		libvisca_win32.c
 		libvisca_serial_win32.c
 		libvisca_tcp.c
+		libvisca_udp.c
 	)
 	if(BUILD_SHARED_LIBS)
 		set_target_properties(visca PROPERTIES COMPILE_DEFINITIONS "VISCA_API=__declspec(dllexport)")
@@ -19,6 +20,7 @@ ELSE()
 		libvisca_posix.c
 		libvisca_serial_posix.c
 		libvisca_tcp.c
+		libvisca_udp.c
 	)
 
 SET_TARGET_PROPERTIES(visca PROPERTIES SOVERSION 0.2.0)
