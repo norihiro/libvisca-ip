@@ -35,10 +35,6 @@ static int visca_tcp_cb_close(VISCAInterface_t *iface)
 		return VISCA_FAILURE;
 	VISCA_tcp_ctx_t *ctx = iface->ctx;
 
-	// read the rest of the data: (should be empty)
-	unsigned char packet[3000];
-	uint32_t buffer_size = 3000;
-
 	if (ctx->sockfd != -1) {
 		close(ctx->sockfd);
 		free(ctx);
