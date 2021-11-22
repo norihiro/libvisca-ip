@@ -111,7 +111,7 @@ void _VISCA_init_packet(VISCAPacket_t *packet)
 	packet->length = 1;
 }
 
-VISCA_API uint32_t _VISCA_get_reply(VISCAInterface_t *iface, VISCACamera_t *camera)
+uint32_t _VISCA_get_reply(VISCAInterface_t *iface, VISCACamera_t *camera)
 {
 	// first message: -------------------
 	if (_VISCA_get_packet(iface) != VISCA_SUCCESS)
@@ -142,7 +142,7 @@ VISCA_API uint32_t _VISCA_get_reply(VISCAInterface_t *iface, VISCACamera_t *came
 	return VISCA_FAILURE;
 }
 
-VISCA_API uint32_t _VISCA_send_packet_with_reply(VISCAInterface_t *iface, VISCACamera_t *camera, VISCAPacket_t *packet)
+uint32_t _VISCA_send_packet_with_reply(VISCAInterface_t *iface, VISCACamera_t *camera, VISCAPacket_t *packet)
 {
 	if (_VISCA_send_packet(iface, camera, packet) != VISCA_SUCCESS)
 		return VISCA_FAILURE;

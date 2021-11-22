@@ -498,12 +498,6 @@ VISCA_API uint32_t VISCA_clear(VISCAInterface_t *iface, VISCACamera_t *camera);
 
 VISCA_API uint32_t VISCA_get_camera_info(VISCAInterface_t *iface, VISCACamera_t *camera);
 
-VISCA_API uint32_t _VISCA_write_packet_data(VISCAInterface_t *iface, VISCACamera_t *camera, VISCAPacket_t *packet);
-
-VISCA_API uint32_t _VISCA_send_packet(VISCAInterface_t *iface, VISCACamera_t *camera, VISCAPacket_t *packet);
-
-VISCA_API uint32_t _VISCA_get_packet(VISCAInterface_t *iface);
-
 VISCA_API uint32_t VISCA_open_serial(VISCAInterface_t *iface, const char *device_name);
 VISCA_API uint32_t VISCA_open_tcp(VISCAInterface_t *iface, const char *hostname, int port);
 
