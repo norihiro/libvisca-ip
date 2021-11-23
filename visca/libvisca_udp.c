@@ -165,7 +165,13 @@ inline static int visca_udp_recv_packet(VISCA_udp_ctx_t *ctx)
 	} else if (buf[0] == 0x02 && buf[1] == 0x00) {
 		// Control command: do nothing
 		if (buf[3] == 2 && buf[8] == 0x0F) {
-			fprintf(stderr, "Error: Control command error %X\n", buf[9]);
+			const char *msg;
+			switch (buf[9]) {
+				case 0x01: msg = "sequence number"; break;
+				case 0x02: msg = "message type"; break;
+				default: msg = "unknown error"; break;
+			}
+			fprintf(stderr, "Error: Control command error %X %s\n", buf[9], msg);
 		}
 		return 0;
 	} else if (buf[0] == 0x02 && buf[1] == 0x01) {
