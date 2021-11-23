@@ -50,7 +50,7 @@ static int visca_serial_cb_close(VISCAInterface_t *iface)
 		return VISCA_FAILURE;
 }
 
-static VISCA_callback_t visca_serial_cb = {
+static const VISCA_callback_t visca_serial_cb = {
 	.write = visca_serial_cb_write,
 	.read = visca_serial_cb_read,
 	.clear_error = visca_serial_cb_clear_error,

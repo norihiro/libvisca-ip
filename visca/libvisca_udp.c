@@ -214,7 +214,7 @@ static int visca_udp_cb_close(VISCAInterface_t *iface)
 		return VISCA_FAILURE;
 }
 
-static VISCA_callback_t visca_udp_cb = {
+static const VISCA_callback_t visca_udp_cb = {
 	.write = visca_udp_cb_write,
 	.read = visca_udp_cb_read,
 	.close = visca_udp_cb_close,

@@ -52,7 +52,7 @@ static int visca_tcp_cb_close(VISCAInterface_t *iface)
 		return VISCA_FAILURE;
 }
 
-static VISCA_callback_t visca_tcp_cb = {
+static const VISCA_callback_t visca_tcp_cb = {
 	.write = visca_tcp_cb_write,
 	.read = visca_tcp_cb_read,
 	.close = visca_tcp_cb_close,
