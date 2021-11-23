@@ -137,8 +137,10 @@ inline static int visca_udp_recv_packet(VISCA_udp_ctx_t *ctx)
 	do {
 		int ret = visca_udp_recv_packet_buf(ctx);
 		if (ret < 0 && (errno == ETIMEDOUT || errno == EAGAIN)) {
-			set_timeout_ms(ctx, 1000);
-			visca_udp_send_packet_buf(ctx);
+			if (ctx->seq_ack != ctx->seq_sent) {
+				set_timeout_ms(ctx, 1000);
+				visca_udp_send_packet_buf(ctx);
+			}
 			continue;
 		} else if (ret < 0 || ret < 8) {
 			fprintf(stderr, "Error: libvisca_udp: recv ret=%d errno=%d\n", ret, errno);
@@ -185,21 +187,22 @@ inline static int visca_udp_recv_packet(VISCA_udp_ctx_t *ctx)
 
 static int visca_udp_cb_read(VISCAInterface_t *iface, void *buf, int length)
 {
+	if (length <= 0)
+		return 0;
+
 	VISCA_udp_ctx_t *ctx = iface->ctx;
+
+	while (ctx->buf_recv_pl_i >= ctx->buf_recv_pl_n) {
+		if (visca_udp_recv_packet(ctx))
+			return -1;
+	}
 
 	int ret = 0;
 	uint8_t *buf_int = buf;
-	while (length > 0) {
-		if (ctx->buf_recv_pl_i >= ctx->buf_recv_pl_n) {
-			if (visca_udp_recv_packet(ctx))
-				break;
-		}
-
-		if (ctx->buf_recv_pl_i != ctx->buf_recv_pl_n) {
-			*buf_int++ = ctx->buf_recv[ctx->buf_recv_pl_i++];
-			length--;
-			ret++;
-		}
+	while (length > 0 && ctx->buf_recv_pl_i != ctx->buf_recv_pl_n) {
+		*buf_int++ = ctx->buf_recv[ctx->buf_recv_pl_i++];
+		length--;
+		ret++;
 	}
 
 	return ret;
