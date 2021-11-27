@@ -472,7 +472,6 @@ typedef struct _VISCA_camera {
 	uint32_t model;
 	uint32_t rom_version;
 	uint32_t socket_num;
-
 } VISCACamera_t;
 
 /* TITLE STRUCTURE */
@@ -482,7 +481,6 @@ typedef struct _VISCA_title {
 	uint32_t color;
 	uint32_t blink;
 	unsigned char title[20];
-
 } VISCATitleData_t;
 
 typedef struct _VISCA_packet {
