@@ -33,7 +33,11 @@ const char *b2s(const uint8_t *buf, int length)
 #endif // DEBUG_UDP
 
 typedef struct _VISCA_udp_ctx {
+#ifdef VISCA_WIN
+	SOCKET sockfd;
+#else
 	int sockfd;
+#endif
 
 	struct sockaddr_in addr;
 
@@ -67,7 +71,7 @@ inline static void set_timeout_ms(VISCA_udp_ctx_t *ctx, int timeout)
 	struct timeval tv;
 	tv.tv_sec = timeout / 1000;
 	tv.tv_usec = (timeout % 1000) * 1000;
-	if (setsockopt(ctx->sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
+	if (setsockopt(ctx->sockfd, SOL_SOCKET, SO_RCVTIMEO, (const void *)&tv, sizeof(tv)) < 0)
 		fprintf(stderr, "Error: setsockopt(SO_RCVTIMEO) failed");
 }
 
@@ -217,7 +221,11 @@ static int visca_udp_cb_close(VISCAInterface_t *iface)
 	VISCA_udp_ctx_t *ctx = iface->ctx;
 
 	if (ctx->sockfd != -1) {
+#ifdef VISCA_WIN
+		closesocket(ctx->sockfd);
+#else
 		close(ctx->sockfd);
+#endif
 		free(ctx);
 		iface->ctx = NULL;
 		return VISCA_SUCCESS;
@@ -262,7 +270,7 @@ static int initialize_socket(VISCA_udp_ctx_t *ctx, const char *hostname, int por
 		return 1;
 	}
 
-	if (setsockopt(ctx->sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
+	if (setsockopt(ctx->sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&(int){1}, sizeof(int)) < 0)
 		fprintf(stderr, "Error: setsockopt(SO_REUSEADDR) failed");
 
 	set_timeout_ms(ctx, 100);
