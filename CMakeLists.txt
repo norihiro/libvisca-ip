@@ -2,6 +2,8 @@ PROJECT(libvisca C)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 SET(VERSION "2.0.0")
 
+option(WITH_VISCA_SERIAL "Enable serial port VISCA" ON)
+
 IF(UNIX)
     # Create PkgConfig file
     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/libvisca.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libvisca.pc @ONLY)
