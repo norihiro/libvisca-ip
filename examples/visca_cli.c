@@ -184,8 +184,8 @@ set_pantilt_absolute_position <pan_speed> <tilt_speed>
                               <pan_position> <tilt_position> (set position,
                                                      pan_speed from 1 to 24, 
 						     tilt speed from 1 to 20,
-						     pan_pos: -879 to 880, 
-						     tilt_pos: -299 to 300)
+						     pan_pos: -5120 to 5120,
+						     tilt_pos: -1280 to 1280)
 set_pantilt_relative_position <pan_speed> <tilt_speed> 
                               <pan_position> <tilt_position> (set position,
                                                      pan_speed from 1 to 24, 
@@ -1554,10 +1554,10 @@ int doCommand(char *commandline, int *ret1, int *ret2, int *ret3)
 		if ((arg2 == NULL) || (intarg2 < 1) || (intarg2 > 20)) {
 			return 42;
 		}
-		if ((arg3 == NULL) || (intarg3 < -879) || (intarg3 > 880)) {
+		if ((arg3 == NULL) || (intarg3 < -5120) || (intarg3 > 5120)) {
 			return 43;
 		}
-		if ((arg4 == NULL) || (intarg4 < -299) || (intarg4 > 300)) {
+		if ((arg4 == NULL) || (intarg4 < -1280) || (intarg4 > 1280)) {
 			return 44;
 		}
 		if (VISCA_set_pantilt_absolute_position(&iface, &camera, intarg1, intarg2, intarg3, intarg4) !=
