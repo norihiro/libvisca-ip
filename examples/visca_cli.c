@@ -373,22 +373,13 @@ void print_usage()
 }
 
 /* This routine find the device the camera is attached to (if specified)
- * It concatenates the rest of the commandline and returnes that string
  */
-char *process_commandline(int argc, char **argv)
+static inline int process_commandline(int argc, char **argv)
 {
-	/*loop counter*/
-	int i;
-
-	/*temporarily used to hold the length of a string*/
-	int length = 0;
-
-	/*used to hold the commandline that is returned*/
-	char *commandline;
-
 	/*at least a command has to be specified*/
 	if (argc < 2) {
 		print_usage();
+		return -1;
 	}
 
 	/*Find the ttydev if specified*/
@@ -396,35 +387,14 @@ char *process_commandline(int argc, char **argv)
 		/*after the -d and the device name at least one command has to follow*/
 		if (argc < 4) {
 			print_usage();
+			return -1;
 		} else {
 			ttydev = argv[2];
-			/*we have used up two arguments*/
-			argv += 2;
-			argc -= 2;
+			return 2;
 		}
 	}
 
-	/*concatenate command string*/
-
-	/*find total length of commandline*/
-	length = 0;
-	for (i = 1; i < argc; i++) {
-		length += strlen(argv[i]) + 1;
-	}
-
-	/*allocate memory for commandline*/
-	commandline = (char *)malloc(sizeof(char) * length);
-
-	/*copy the first argument to the commandline*/
-	strcpy(commandline, argv[1]);
-
-	/*add the rest of the arguments, seperated by blanks*/
-	for (i = 2; i < argc; i++) {
-		strcat(commandline, " ");
-		strcat(commandline, argv[i]);
-	}
-
-	return commandline;
+	return 0;
 }
 
 void open_interface()
@@ -522,7 +492,7 @@ void close_interface()
  * 45: missing or unknown arg5
  * 46: camera returned an error  
  */
-int doCommand(char *commandline, int *ret1, int *ret2, int *ret3)
+static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 {
 	/*Variables for the user specified command and arguments*/
 	char *command;
@@ -544,12 +514,12 @@ int doCommand(char *commandline, int *ret1, int *ret2, int *ret3)
 	uint16_t value16;
 
 	/*tokenize the commandline*/
-	command = strtok(commandline, " ");
-	arg1 = strtok(NULL, " ");
-	arg2 = strtok(NULL, " ");
-	arg3 = strtok(NULL, " ");
-	arg4 = strtok(NULL, " ");
-	arg5 = strtok(NULL, " ");
+	command = argv[0];
+	arg1 = argc > 1 ? argv[1] : NULL;
+	arg2 = argc > 2 ? argv[2] : NULL;
+	arg3 = argc > 3 ? argv[3] : NULL;
+	arg4 = argc > 4 ? argv[4] : NULL;
+	arg5 = argc > 5 ? argv[5] : NULL;
 
 	/*Try to convert the arguments to integers*/
 	if (arg1 != NULL) {
@@ -582,7 +552,7 @@ int doCommand(char *commandline, int *ret1, int *ret2, int *ret3)
 	}
 
 #if DEBUG
-	fprintf(stderr, "command: %s\n", command);
+	fprintf(stderr, "argc: %d\n", argc);
 	fprintf(stderr, "arg1: %s\narg2: %s\narg3: %s\narg4: %s\narg5: %s\n", arg1, arg2, arg3, arg4, arg5);
 	fprintf(stderr, "intarg1: %i\nintarg2: %i\nintarg3: %i\nintarg4:%i\nintarg5:%i\n", intarg1, intarg2, intarg3,
 		intarg4, intarg5);
@@ -1654,15 +1624,11 @@ int doCommand(char *commandline, int *ret1, int *ret2, int *ret3)
 		if ((arg4 == NULL) || (intarg4 < 0) || (intarg4 > 1)) {
 			return 44;
 		}
-		if (arg5 == NULL) {
-			return 45;
-		}
 		temptitle = (VISCATitleData_t *)malloc(sizeof(VISCATitleData_t));
 		temptitle->vposition = intarg1;
 		temptitle->hposition = intarg2;
 		temptitle->color = intarg3;
 		temptitle->blink = intarg4;
-		strncpy((char *)temptitle->title, arg5, 19);
 		if (VISCA_set_title_params(&iface, &camera, temptitle) != VISCA_SUCCESS) {
 			free(temptitle);
 			return 46;
@@ -2445,11 +2411,8 @@ int doCommand(char *commandline, int *ret1, int *ret2, int *ret3)
 	return 40;
 }
 
-int run_cmdline(char *commandline)
+static int check_print_errorcode(int errorcode, int ret1, int ret2, int ret3)
 {
-	int errorcode, ret1, ret2, ret3;
-
-	errorcode = doCommand(commandline, &ret1, &ret2, &ret3);
 	switch (errorcode) {
 	case 10:
 		printf("10 OK - no return value\n");
@@ -2493,16 +2456,44 @@ int run_cmdline(char *commandline)
 	return 1;
 }
 
+static int run_cmdline_v(int argc, char **argv)
+{
+	int errorcode, ret1, ret2, ret3;
+
+	errorcode = doCommand(argc, argv, &ret1, &ret2, &ret3);
+
+	return check_print_errorcode(errorcode, ret1, ret2, ret3);
+}
+
+static int run_cmdline(char *commandline)
+{
+	int argc;
+	char *argv[6];
+	argv[0] = strtok(commandline, " ");
+	for (argc = 1; argc < 6; argc++) {
+		argv[argc] = strtok(NULL, " ");
+		if (!argv[argc])
+			break;
+	}
+
+	return run_cmdline_v(argc, argv);
+}
+
 int main(int argc, char **argv)
 {
-	char *commandline;
 	int ret = 0;
 
-	commandline = process_commandline(argc, argv);
+	ret = process_commandline(argc, argv);
+	if (ret < 0) {
+		return 1;
+	}
+
+	argc -= ret;
+	argv += ret;
 
 	open_interface();
 
-	if (strcmp(commandline, "-") == 0) {
+	if (strcmp(argv[1], "-") == 0) {
 		char line[80];
 		while (fgets(line, sizeof(line), stdin)) {
 			for (int i = 0; i < sizeof(line); i++)
@@ -2517,7 +2508,7 @@ int main(int argc, char **argv)
 			ret |= run_cmdline(line);
 		}
 	} else {
-		ret = run_cmdline(commandline);
+		ret = run_cmdline_v(argc - 1, argv + 1);
 	}
 
 	close_interface();

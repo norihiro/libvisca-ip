@@ -186,9 +186,9 @@ VISCA_API uint32_t VISCA_set_address(VISCAInterface_t *iface, int *camera_num)
 	else {
 		/* We parse the message from the camera here  */
 		/* We expect to receive 4*camera_num bytes,
-         every packet should be 88 30 0x FF, x being
-         the camera id+1. The number of cams will thus be
-         ibuf[bytes-2]-1  */
+		   every packet should be 88 30 0x FF, x being
+		   the camera id+1. The number of cams will thus be
+		   ibuf[bytes-2]-1  */
 		if ((iface->bytes & 0x3) != 0) /* check multiple of 4 */
 			return VISCA_FAILURE;
 		else {
