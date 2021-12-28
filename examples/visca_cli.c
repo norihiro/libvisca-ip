@@ -417,7 +417,7 @@ void open_interface()
 		}
 		free(host);
 		is_network = true;
-	} else if (sep = strrchr(ttydev, ':')) {
+	} else if ((sep = strrchr(ttydev, ':'))) {
 		int port = atoi(sep + 1);
 		char *host = strdup(ttydev);
 		host[sep - ttydev] = '\0';

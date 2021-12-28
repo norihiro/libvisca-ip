@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	int camera_num;
 	uint8_t value;
 	uint16_t zoom;
-	uint16_t pan_pos, tilt_pos;
+	int16_t pan_pos, tilt_pos;
 	char *sep;
 
 	if (argc < 2) {
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (sep = strrchr(argv[1], ':')) {
+	if ((sep = strrchr(argv[1], ':'))) {
 		int port = atoi(sep + 1);
 		*sep = '\0';
 		if (VISCA_open_tcp(&iface, argv[1], port) != VISCA_SUCCESS) {
