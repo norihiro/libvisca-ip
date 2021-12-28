@@ -47,8 +47,11 @@ static uint32_t VISCA_unread_bytes(VISCAInterface_t *iface, unsigned char *buffe
 
 	ioctl(ctx->port_fd, FIONREAD, &bytes);
 	if (bytes > 0) {
+		ssize_t ret;
 		bytes = (bytes > *buffer_size) ? *buffer_size : bytes;
-		read(ctx->port_fd, &buffer, bytes);
+		ret = read(ctx->port_fd, &buffer, bytes);
+		if (ret != bytes)
+			return bytes = ret;
 		*buffer_size = bytes;
 		return VISCA_FAILURE;
 	}
