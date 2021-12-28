@@ -239,21 +239,34 @@ static const VISCA_callback_t visca_udp_cb = {
 	.close = visca_udp_cb_close,
 };
 
-static int initialize_socket(VISCA_udp_ctx_t *ctx, const char *hostname, int port)
+static int resolve_hostname(struct sockaddr_in *dst, const char *hostname)
 {
 	struct hostent *servhost = gethostbyname(hostname);
-	if (!servhost) {
-		u_long addr = inet_addr(hostname);
-		servhost = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET);
-		if (!servhost) {
-			fprintf(stderr, "Error: cannot get server address for \"%s\"\n", hostname);
-			return 1;
-		}
+	if (servhost) {
+		dst->sin_family = AF_INET;
+		memcpy(&dst->sin_addr, servhost->h_addr, servhost->h_length);
+		return 0;
 	}
 
-	ctx->addr.sin_family = AF_INET;
+	u_long addr = inet_addr(hostname);
+	servhost = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET);
+	if (servhost) {
+		dst->sin_family = AF_INET;
+		memcpy(&dst->sin_addr, servhost->h_addr, servhost->h_length);
+		return 0;
+	}
+
+	return 1;
+}
+
+static int initialize_socket(VISCA_udp_ctx_t *ctx, const char *hostname, int port, const char *bind_address)
+{
+	if (resolve_hostname(&ctx->addr, hostname)) {
+		fprintf(stderr, "Error: cannot get server address for \"%s\"\n", hostname);
+		return 1;
+	}
+
 	ctx->addr.sin_port = htons(port);
-	memcpy(&ctx->addr.sin_addr, servhost->h_addr, servhost->h_length);
 
 	ctx->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (ctx->sockfd < 0) {
@@ -265,8 +278,12 @@ static int initialize_socket(VISCA_udp_ctx_t *ctx, const char *hostname, int por
 		.sin_family = AF_INET,
 		.sin_port = htons(port),
 	};
+
+	if (bind_address)
+		resolve_hostname(&server, bind_address);
+
 	if (bind(ctx->sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
-		fprintf(stderr, "Error: cannot bind UDP port %d\n", port);
+		fprintf(stderr, "Error: cannot bind UDP port %d %s\n", port, bind_address ? bind_address : "");
 		return 1;
 	}
 
@@ -297,9 +314,14 @@ inline static int visca_udp_control_reset(VISCA_udp_ctx_t *ctx)
 
 uint32_t VISCA_open_udp(VISCAInterface_t *iface, const char *hostname, int port)
 {
+	return VISCA_open_udp4(iface, hostname, port, NULL);
+}
+
+uint32_t VISCA_open_udp4(VISCAInterface_t *iface, const char *hostname, int port, const char *bind_address)
+{
 	VISCA_udp_ctx_t *ctx = calloc(1, sizeof(VISCA_udp_ctx_t));
 
-	if (initialize_socket(ctx, hostname, port)) {
+	if (initialize_socket(ctx, hostname, port, bind_address)) {
 		free(ctx);
 		return VISCA_FAILURE;
 	}

@@ -342,6 +342,7 @@ get_md_obj_pos (returns the center position of the detection frame divided
 #include "../visca/libvisca.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <fcntl.h> /* File control definitions */
 #include <errno.h> /* Error number definitions */
 #include <string.h>
@@ -429,16 +430,23 @@ char *process_commandline(int argc, char **argv)
 void open_interface()
 {
 	int camera_num;
+	bool is_network = false;
 	char *sep;
-	if (strncmp(ttydev, "udp://", 6) == 0 && (sep = strrchr(ttydev + 6, ':'))) {
+	if (strncmp(ttydev, "udp://", 6) == 0 && (sep = strchr(ttydev + 6, ':'))) {
 		int port = atoi(sep + 1);
 		char *host = strdup(ttydev + 6);
+		char *bind_addr = NULL;
 		host[sep - (ttydev + 6)] = '\0';
-		if (VISCA_open_udp(&iface, host, port) != VISCA_SUCCESS) {
+		sep = strchr(sep + 1, ':');
+		if (sep) {
+			bind_addr = sep + 1;
+		}
+		if (VISCA_open_udp4(&iface, host, port, bind_addr) != VISCA_SUCCESS) {
 			fprintf(stderr, "visca-cli: unable to open udp device %s:%d\n", host, port);
 			exit(1);
 		}
 		free(host);
+		is_network = true;
 	} else if (sep = strrchr(ttydev, ':')) {
 		int port = atoi(sep + 1);
 		char *host = strdup(ttydev);
@@ -448,13 +456,14 @@ void open_interface()
 			exit(1);
 		}
 		free(host);
+		is_network = true;
 	} else if (VISCA_open_serial(&iface, ttydev) != VISCA_SUCCESS) {
 		fprintf(stderr, "visca-cli: unable to open serial device %s\n", ttydev);
 		exit(1);
 	}
 
 	iface.broadcast = 0;
-	if (!sep && VISCA_set_address(&iface, &camera_num) != VISCA_SUCCESS) {
+	if (!is_network && VISCA_set_address(&iface, &camera_num) != VISCA_SUCCESS) {
 #ifdef WIN
 		_RPTF0(_CRT_WARN, "unable to set address\n");
 #endif
