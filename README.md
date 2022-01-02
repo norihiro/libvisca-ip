@@ -17,6 +17,10 @@ For iptables users, run this command or equivalent.
 ```
 sudo iptables -I INPUT 1 -j ACCEPT -p udp --dport 52381
 ```
+For firewalld users, run this command.
+```
+firewall-cmd --add-port 52381/udp
+```
 
 ## Acknowledge
 
