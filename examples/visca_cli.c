@@ -113,7 +113,7 @@ set_focus_value <focus>          (set the focus to the given value
                                   between 1000 and 40959)
 set_focus_near_limit <limit>     (not for D30)
 set_whitebal_mode <mode>         (set the whitebalance mode to 
-                                  0: Auto, 1: Indoor, 2: Outdoor, 3: OnePush)
+                                  0: Auto, 1: Indoor, 2: Outdoor, 3: OnePush, 4 ATW, 5 Manual)
 set_rgain_value <value>          (not for D30)
 set_bgain_value <value>          (not for D30)
 set_shutter_value <value>        (set the shutter value between 
@@ -1167,7 +1167,7 @@ static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 #endif
 
 	if (strcmp(command, "set_whitebal_mode") == 0) {
-		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 3)) {
+		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 5)) {
 			return 41;
 		}
 		if (VISCA_set_whitebal_mode(&iface, &camera, intarg1) != VISCA_SUCCESS) {
@@ -1178,7 +1178,7 @@ static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 
 #if !D30ONLY
 	if (strcmp(command, "set_rgain_value") == 0) {
-		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 1)) {
+		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 255)) {
 			return 41;
 		}
 		if (VISCA_set_rgain_value(&iface, &camera, intarg1) != VISCA_SUCCESS) {
@@ -1190,7 +1190,7 @@ static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 
 #if !D30ONLY
 	if (strcmp(command, "set_bgain_value") == 0) {
-		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 1)) {
+		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 255)) {
 			return 41;
 		}
 		if (VISCA_set_bgain_value(&iface, &camera, intarg1) != VISCA_SUCCESS) {
@@ -1221,7 +1221,7 @@ static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 	}
 
 	if (strcmp(command, "set_gain_value") == 0) {
-		if ((arg1 == NULL) || (intarg1 < 1) || (intarg1 > 7)) {
+		if ((arg1 == NULL) || (intarg1 < 1) || (intarg1 > 15)) {
 			return 41;
 		}
 		if (VISCA_set_gain_value(&iface, &camera, intarg1) != VISCA_SUCCESS) {
@@ -1232,7 +1232,7 @@ static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 
 #if !D30ONLY
 	if (strcmp(command, "set_bright_value") == 0) {
-		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 1)) {
+		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 31)) {
 			return 41;
 		}
 		if (VISCA_set_bright_value(&iface, &camera, intarg1) != VISCA_SUCCESS) {
@@ -1244,7 +1244,7 @@ static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 
 #if !D30ONLY
 	if (strcmp(command, "set_aperture_value") == 0) {
-		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 1)) {
+		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 15)) {
 			return 41;
 		}
 		if (VISCA_set_aperture_value(&iface, &camera, intarg1) != VISCA_SUCCESS) {
@@ -1256,7 +1256,7 @@ static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 
 #if !D30ONLY
 	if (strcmp(command, "set_exp_comp_value") == 0) {
-		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 1)) {
+		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 14)) {
 			return 41;
 		}
 		if (VISCA_set_exp_comp_value(&iface, &camera, intarg1) != VISCA_SUCCESS) {
@@ -1295,7 +1295,7 @@ static int doCommand(int argc, char **argv, int *ret1, int *ret2, int *ret3)
 
 #if !D30ONLY
 	if (strcmp(command, "set_picture_effect") == 0) {
-		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 1)) {
+		if ((arg1 == NULL) || (intarg1 < 0) || (intarg1 > 4)) {
 			return 41;
 		}
 		if (VISCA_set_picture_effect(&iface, &camera, intarg1) != VISCA_SUCCESS) {
