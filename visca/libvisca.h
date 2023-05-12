@@ -337,8 +337,8 @@
 /***************/
 
 /* these two are defined by me, not by the specs. */
-#define VISCA_SUCCESS 0x00
-#define VISCA_FAILURE 0xFF
+#define VISCA_SUCCESS ((uint32_t)0x00)
+#define VISCA_FAILURE ((uint32_t)0xFF)
 
 /* specs errors: */
 #define VISCA_ERROR_MESSAGE_LENGTH 0x01
