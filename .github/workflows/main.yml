@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ '*' ]
   pull_request:
     branches: [ main ]
 
@@ -64,6 +64,8 @@ jobs:
         mkdir publish-ex
         cp build/visca/${{env.BUILD_TYPE}}/*.{dll,lib} publish-ex/
         cp build/examples/${{env.BUILD_TYPE}}/*.exe publish-ex/
+
+    - uses: mxschmitt/action-tmate@v3
 
     - name: 'Publish Libraries'
       if: success()
