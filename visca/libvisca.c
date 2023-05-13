@@ -23,6 +23,7 @@
 
 #ifdef VISCA_WIN
 #ifdef _DEBUG
+#include <stdio.h>
 #define DEBUG 1
 #else
 #undef DEBUG
