@@ -14,6 +14,8 @@
 #include <errno.h>
 #endif
 
+#define TIMEDOUT_MAX 3
+
 // #define DEBUG_UDP
 #ifdef DEBUG_UDP
 const char *b2s(const uint8_t *buf, int length)
@@ -40,6 +42,7 @@ typedef struct _VISCA_udp_ctx {
 #endif
 
 	struct sockaddr_in addr;
+	int n_timedout;
 
 	uint32_t seq_sent;
 	uint32_t seq_ack;
@@ -141,6 +144,12 @@ inline static int visca_udp_recv_packet(VISCA_udp_ctx_t *ctx)
 	do {
 		int ret = visca_udp_recv_packet_buf(ctx);
 		if (ret < 0 && (errno == ETIMEDOUT || errno == EAGAIN)) {
+			if (ctx->n_timedout++ >= TIMEDOUT_MAX) {
+				fprintf(stderr,
+					"Error: libvisca_udp: too much attempt to receive but no response. errno=%d\n",
+					errno);
+				return 1;
+			}
 			if (ctx->seq_ack != ctx->seq_sent) {
 				set_timeout_ms(ctx, 1000);
 				visca_udp_send_packet_buf(ctx);
@@ -150,6 +159,7 @@ inline static int visca_udp_recv_packet(VISCA_udp_ctx_t *ctx)
 			fprintf(stderr, "Error: libvisca_udp: recv ret=%d errno=%d\n", ret, errno);
 			return 1;
 		}
+		ctx->n_timedout = 0;
 
 		ctx->seq_ack = (buf[4] << 24) | (buf[5] << 16) | (buf[6] << 8) | buf[7];
 	} while (ctx->seq_ack != ctx->seq_sent);
