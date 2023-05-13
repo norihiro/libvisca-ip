@@ -71,11 +71,17 @@ inline static int is_payload_device_setting(const uint8_t *buf)
 
 inline static void set_timeout_ms(VISCA_udp_ctx_t *ctx, int timeout)
 {
+#ifdef VISCA_WIN
+	DWORD tv = timeout;
+	if (setsockopt(ctx->sockfd, SOL_SOCKET, SO_RCVTIMEO, (const void *)&tv, sizeof(tv)) < 0)
+		fprintf(stderr, "Error: setsockopt(SO_RCVTIMEO) failed");
+#else
 	struct timeval tv;
 	tv.tv_sec = timeout / 1000;
 	tv.tv_usec = (timeout % 1000) * 1000;
 	if (setsockopt(ctx->sockfd, SOL_SOCKET, SO_RCVTIMEO, (const void *)&tv, sizeof(tv)) < 0)
 		fprintf(stderr, "Error: setsockopt(SO_RCVTIMEO) failed");
+#endif
 }
 
 static int visca_udp_send_packet_buf(VISCA_udp_ctx_t *ctx)
