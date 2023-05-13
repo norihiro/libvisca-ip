@@ -293,6 +293,11 @@ static int initialize_socket(VISCA_udp_ctx_t *ctx, const char *hostname, int por
 		resolve_hostname(&server, bind_address);
 
 	if (bind(ctx->sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
+#ifdef VISCA_WIN
+		closesocket(ctx->sockfd);
+#else
+		close(ctx->sockfd);
+#endif
 		fprintf(stderr, "Error: cannot bind UDP port %d %s\n", port, bind_address ? bind_address : "");
 		return 1;
 	}
@@ -341,8 +346,10 @@ uint32_t VISCA_open_udp4(VISCAInterface_t *iface, const char *hostname, int port
 	iface->address = 0;
 	iface->broadcast = 0;
 
-	if (visca_udp_control_reset(ctx))
+	if (visca_udp_control_reset(ctx)) {
+		visca_udp_cb_close(iface);
 		return VISCA_FAILURE;
+	}
 
 	return VISCA_SUCCESS;
 }
