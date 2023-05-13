@@ -249,7 +249,7 @@ static int resolve_hostname(struct sockaddr_in *dst, const char *hostname)
 	}
 
 	u_long addr = inet_addr(hostname);
-	servhost = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET);
+	servhost = gethostbyaddr((char *)&addr, 4, AF_INET);
 	if (servhost) {
 		dst->sin_family = AF_INET;
 		memcpy(&dst->sin_addr, servhost->h_addr, servhost->h_length);
